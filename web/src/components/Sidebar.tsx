@@ -1,18 +1,35 @@
+// src/components/Sidebar.tsx
+
 import React from 'react';
-import { List, ListItem, ListItemText, Drawer, Divider } from '@mui/material';
-import Link from 'next/link';
+import { List, ListItem, ListItemText, CssBaseline, Drawer, Typography, Divider } from '@mui/material';
+
+const drawerWidth = 240;
 
 const Sidebar = () => {
   return (
-    <Drawer variant="permanent">
+    <Drawer
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: drawerWidth,
+          boxSizing: 'border-box',
+        },
+      }}
+      variant="permanent"
+      anchor="left"
+    >
+      <CssBaseline />
+      <Typography variant="h6" noWrap component="div" sx={{ p: 2 }}>
+        Task Board
+      </Typography>
+      <Divider />
       <List>
-        <ListItem button component={Link} href="/">
-          <ListItemText primary="Home" />
-        </ListItem>
-        <Divider />
-        <ListItem button component={Link} href="/tasks">
-          <ListItemText primary="Tasks" />
-        </ListItem>
+        {['Home', 'Tasks'].map((text) => (
+          <ListItem button key={text} component="a" href={`/${text === 'Home' ? '' : text.toLowerCase().replace(' ', '-')}`}>
+            <ListItemText primary={text} />
+          </ListItem>
+        ))}
       </List>
     </Drawer>
   );

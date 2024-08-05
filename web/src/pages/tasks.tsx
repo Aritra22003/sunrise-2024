@@ -1,8 +1,13 @@
+// src/pages/tasks.tsx
+
 import React, { useEffect, useState } from 'react';
 import { initializeTasks, getActiveTasks, completeTask, createTask, updateTask, deleteTask, getCompletedTasks } from '@/modules/taskManager';
-import { Container, Typography, Button, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Box, CssBaseline } from '@mui/material';
+import { Container, Typography, Button, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Box, CssBaseline, IconButton } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Sidebar from '@/components/Sidebar';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DoneIcon from '@mui/icons-material/Done';
 
 const darkTheme = createTheme({
   palette: {
@@ -51,6 +56,7 @@ const TaskManager = () => {
       updateTask(selectedTask.id, { title: newTaskTitle, description: newTaskDescription, group: newTaskGroup, persona: newTaskPersona });
       setActiveTasks(getActiveTasks());
       setSelectedTask(null);
+      setOpenCreateDialog(false);
     }
   };
 
@@ -58,6 +64,15 @@ const TaskManager = () => {
     deleteTask(id);
     setActiveTasks(getActiveTasks());
     setCompletedTasks(getCompletedTasks());
+  };
+
+  const openEditDialog = (task) => {
+    setSelectedTask(task);
+    setNewTaskTitle(task.title);
+    setNewTaskDescription(task.description);
+    setNewTaskGroup(task.group);
+    setNewTaskPersona(task.persona);
+    setOpenCreateDialog(true);
   };
 
   return (
@@ -73,8 +88,17 @@ const TaskManager = () => {
           <Typography variant="h6" gutterBottom>Active Tasks</Typography>
           <List>
             {activeTasks.map(task => (
-              <ListItem key={task.id} button onClick={() => handleCompleteTask(task.title)}>
+              <ListItem key={task.id}>
                 <ListItemText primary={task.title} secondary={task.description} />
+                <IconButton onClick={() => handleCompleteTask(task.title)} color="primary">
+                  <DoneIcon />
+                </IconButton>
+                <IconButton onClick={() => openEditDialog(task)} color="primary">
+                  <EditIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDeleteTask(task.id)} color="secondary">
+                  <DeleteIcon />
+                </IconButton>
               </ListItem>
             ))}
           </List>
