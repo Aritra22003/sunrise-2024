@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { initializeTasks, getActiveTasks, completeTask, getCompletedTasks, createTask, updateTask, deleteTask } from '@/modules/taskManager';
-import { Container, Typography, Button, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
+import { initializeTasks, getActiveTasks, completeTask, createTask, updateTask, deleteTask, getCompletedTasks } from '@/modules/taskManager';
+import { Container, Typography, Button, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Box, CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Sidebar from '@/components/Sidebar';
 
 const darkTheme = createTheme({
   palette: {
@@ -25,6 +26,7 @@ const TaskManager = () => {
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [newTaskGroup, setNewTaskGroup] = useState(1);
   const [newTaskPersona, setNewTaskPersona] = useState('');
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     initializeTasks();
@@ -44,74 +46,94 @@ const TaskManager = () => {
     setOpenCreateDialog(false);
   };
 
+  const handleUpdateTask = () => {
+    if (selectedTask) {
+      updateTask(selectedTask.id, { title: newTaskTitle, description: newTaskDescription, group: newTaskGroup, persona: newTaskPersona });
+      setActiveTasks(getActiveTasks());
+      setSelectedTask(null);
+    }
+  };
+
+  const handleDeleteTask = (id: number) => {
+    deleteTask(id);
+    setActiveTasks(getActiveTasks());
+    setCompletedTasks(getCompletedTasks());
+  };
+
   return (
     <ThemeProvider theme={darkTheme}>
-      <Container>
-        <Typography variant="h4" gutterBottom>Task Manager</Typography>
-        
-        <Typography variant="h6" gutterBottom>Active Tasks</Typography>
-        <List>
-          {activeTasks.map(task => (
-            <ListItem key={task.id} button onClick={() => handleCompleteTask(task.title)}>
-              <ListItemText primary={task.title} secondary={task.description} />
-            </ListItem>
-          ))}
-        </List>
+      <CssBaseline />
+      <Box display="flex">
+        <Sidebar />
+        <Container>
+          <Typography variant="h4" gutterBottom>Task Manager</Typography>
 
-        <Typography variant="h6" gutterBottom>Completed Tasks</Typography>
-        <List>
-          {completedTasks.map(task => (
-            <ListItem key={task.id}>
-              <ListItemText primary={task.title} secondary={task.description} />
-            </ListItem>
-          ))}
-        </List>
+          <Button variant="contained" color="primary" onClick={() => setOpenCreateDialog(true)}>Create Task</Button>
 
-        <Button variant="contained" color="primary" onClick={() => setOpenCreateDialog(true)}>Create Task</Button>
+          <Typography variant="h6" gutterBottom>Active Tasks</Typography>
+          <List>
+            {activeTasks.map(task => (
+              <ListItem key={task.id} button onClick={() => handleCompleteTask(task.title)}>
+                <ListItemText primary={task.title} secondary={task.description} />
+              </ListItem>
+            ))}
+          </List>
 
-        <Dialog open={openCreateDialog} onClose={() => setOpenCreateDialog(false)}>
-          <DialogTitle>Create a New Task</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Fill in the details of the new task.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Task Title"
-              fullWidth
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-            />
-            <TextField
-              margin="dense"
-              label="Task Description"
-              fullWidth
-              value={newTaskDescription}
-              onChange={(e) => setNewTaskDescription(e.target.value)}
-            />
-            <TextField
-              margin="dense"
-              label="Task Group"
-              fullWidth
-              type="number"
-              value={newTaskGroup}
-              onChange={(e) => setNewTaskGroup(Number(e.target.value))}
-            />
-            <TextField
-              margin="dense"
-              label="Task Persona"
-              fullWidth
-              value={newTaskPersona}
-              onChange={(e) => setNewTaskPersona(e.target.value)}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenCreateDialog(false)} color="primary">Cancel</Button>
-            <Button onClick={handleCreateTask} color="primary">Create</Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
+          <Typography variant="h6" gutterBottom>Completed Tasks</Typography>
+          <List>
+            {completedTasks.map(task => (
+              <ListItem key={task.id}>
+                <ListItemText primary={task.title} secondary={task.description} />
+              </ListItem>
+            ))}
+          </List>
+
+          <Dialog open={openCreateDialog} onClose={() => setOpenCreateDialog(false)}>
+            <DialogTitle>{selectedTask ? 'Update Task' : 'Create a New Task'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Fill in the details of the {selectedTask ? 'task to update' : 'new task'}.
+              </DialogContentText>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Task Title"
+                fullWidth
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Task Description"
+                fullWidth
+                value={newTaskDescription}
+                onChange={(e) => setNewTaskDescription(e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Task Group"
+                fullWidth
+                type="number"
+                value={newTaskGroup}
+                onChange={(e) => setNewTaskGroup(Number(e.target.value))}
+              />
+              <TextField
+                margin="dense"
+                label="Task Persona"
+                fullWidth
+                value={newTaskPersona}
+                onChange={(e) => setNewTaskPersona(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenCreateDialog(false)} color="primary">Cancel</Button>
+              <Button onClick={selectedTask ? handleUpdateTask : handleCreateTask} color="primary">
+                {selectedTask ? 'Update' : 'Create'}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 };

@@ -1,7 +1,7 @@
-import React from 'react';
-import { Container, Typography, Button } from '@mui/material';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
+import { Container, Typography, Box, CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Sidebar from '@/components/Sidebar';
 
 const darkTheme = createTheme({
   palette: {
@@ -17,17 +17,35 @@ const darkTheme = createTheme({
   },
 });
 
-const Home = () => {
+const quotes = [
+  "You learn more from failure than from success. Don’t let it stop you. Failure builds character. - Unknown",
+  "The pessimist sees difficulty in every opportunity. The optimist sees opportunity in every difficulty. - Winston Churchill",
+  // Add more quotes as needed
+];
+
+const IndexPage = () => {
+  const [quote, setQuote] = useState('');
+
+  useEffect(() => {
+    // Ensure the quote is only set on the client side
+    setQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
-      <Container>
-        <Typography variant="h4" gutterBottom>Welcome to the Task Manager</Typography>
-        <Link href="/tasks" passHref>
-          <Button variant="contained" color="primary">Go to Task Manager</Button>
-        </Link>
-      </Container>
+      <CssBaseline />
+      <Box display="flex">
+        <Sidebar />
+        <Container>
+          <Typography variant="h4" gutterBottom>Welcome to the Task Board</Typography>
+          <Typography variant="h6" gutterBottom>
+            {quote ? quote : quotes[0]}
+          </Typography>
+          {/* Other homepage content */}
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 };
 
-export default Home;
+export default IndexPage;
