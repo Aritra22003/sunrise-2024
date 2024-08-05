@@ -48,16 +48,14 @@ export function getAllTasks(): Task[] {
 }
 
 export function createTask(title: string, description: string, persona: string, group: number): void {
-  if (!tasks.some(task => task.title === title)) {
-    tasks.push({
-      id: taskIdCounter++,
-      title,
-      description,
-      group,
-      persona,
-      completed: false,
-    });
-  }
+  tasks.push({
+    id: taskIdCounter++,
+    title,
+    description,
+    group,
+    persona,
+    completed: false,
+  });
 }
 
 export function updateTask(id: number, updatedTask: Partial<Task>): void {
